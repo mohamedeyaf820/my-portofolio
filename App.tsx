@@ -8,6 +8,7 @@ import Contact from './components/Contact';
 import Testimonials from './components/Testimonials';
 import Footer from './components/Footer';
 import ChatAssistant from './components/ChatAssistant';
+import Services from './components/Services';
 
 const App: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -28,8 +29,9 @@ const App: React.FC = () => {
             <span className={isScrolled ? 'opacity-100' : 'opacity-100'}>Mohamed<span className="text-blue-500">.</span></span>
           </div>
           
-          <div className="hidden md:flex gap-10 text-sm font-bold uppercase tracking-widest text-slate-400">
+          <div className="hidden lg:flex gap-10 text-sm font-bold uppercase tracking-widest text-slate-400">
             <a href="#about" className="hover:text-blue-400 transition-all">Profil</a>
+            <a href="#services" className="hover:text-blue-400 transition-all">Services</a>
             <a href="#projects" className="hover:text-blue-400 transition-all">Travaux</a>
             <a href="#skills" className="hover:text-blue-400 transition-all">Expertise</a>
             <a href="#contact" className="hover:text-blue-400 transition-all">Contact</a>
@@ -44,6 +46,7 @@ const App: React.FC = () => {
       <main>
         <Hero />
         <Education />
+        <Services />
         <Projects />
         <Skills />
         <Testimonials />

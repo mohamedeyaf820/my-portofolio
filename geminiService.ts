@@ -4,7 +4,12 @@ import { MOHAMED_CONTEXT } from "./constants";
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "" });
 
-export async function chatWithMohamed(message: string, history: { role: 'user' | 'model', parts: { text: string }[] }[] = []) {
+export interface ChatResponse {
+  text: string;
+  sources?: { uri: string; title: string }[];
+}
+
+export async function chatWithMohamed(message: string, history: { role: 'user' | 'model', parts: { text: string }[] }[] = []): Promise<ChatResponse> {
   try {
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
@@ -18,13 +23,28 @@ export async function chatWithMohamed(message: string, history: { role: 'user' |
         temperature: 0.7,
         topP: 0.8,
         topK: 40,
-        maxOutputTokens: 200,
+        maxOutputTokens: 800,
+        tools: [{ googleSearch: {} }]
       }
     });
 
-    return response.text || "Désolé, je n'ai pas pu générer de réponse.";
-  } catch (error) {
+    const text = response.text || "Désolé, je n'ai pas pu générer de réponse.";
+    
+    // Extract grounding chunks if available
+    const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks;
+    const sources = groundingChunks?.map((chunk: any) => {
+      if (chunk.web) {
+        return { uri: chunk.web.uri, title: chunk.web.title };
+      }
+      return null;
+    }).filter(Boolean) as { uri: string; title: string }[] | undefined;
+
+    return { text, sources };
+  } catch (error: any) {
     console.error("Gemini Error:", error);
-    return "Une erreur est survenue lors de la communication avec l'assistant IA.";
+    if (error.message?.includes("Requested entity was not found")) {
+      // Handle potential API key issues gracefully if needed
+    }
+    return { text: "Une erreur est survenue lors de la communication avec l'assistant IA." };
   }
 }
